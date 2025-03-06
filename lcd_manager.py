@@ -12,22 +12,18 @@ class LCDManager:
     def clear(self):
         self.lcd.clear()
 
-    def display_playlists(self, playlists):
-        """Display current window of playlists with arrow indicating selection"""
-        self.clear()
+def display_playlists(self, playlists):
+    """Display current window of playlists with arrow indicating selection"""
+    window_end = min(self.window_start + self.max_lines, len(playlists))
+    displayed_playlists = playlists[self.window_start:window_end]
+
+    for i, playlist in enumerate(displayed_playlists):
+        # Calculate which line should show the arrow
+        prefix = '->' if (self.window_start + i) == self.selected_index else '  '
         
-        # Calculate which playlists to show
-        window_end = min(self.window_start + self.max_lines, len(playlists))
-        displayed_playlists = playlists[self.window_start:window_end]
-        
-        # Calculate which line should show the arrow (0-3)
-        arrow_line = self.selected_index - self.window_start
-        
-        # Display each playlist in the current window
-        for i, playlist in enumerate(displayed_playlists):
-            # Add arrow if this is the selected line
-            prefix = '->' if i == arrow_line else '  '
-            self.lcd.text(f"{prefix} {playlist}", i + 1)  # LCD lines are 1-based
+        # Write only this line instead of clearing everything
+        self.lcd.text(f"{prefix} {playlist}", i + 1)  # LCD lines are 1-based
+
 
     def scroll_up(self, playlists):
         """Move selection up one line, updating window if necessary"""
