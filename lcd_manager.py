@@ -14,7 +14,7 @@ class LCDManager:
 
     def display_playlists(self, playlists, prev_index=None):
         """Display current window of playlists with arrow indicating selection, optimized for speed"""
-        window_end = min(self.window_start + self.max_lines, len(playlists))
+        window_end =len(playlists)
         displayed_playlists = playlists[self.window_start:window_end]
 
         for i, playlist in enumerate(displayed_playlists):
