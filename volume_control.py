@@ -3,7 +3,7 @@ import time
 import pygame
 
 class VolumeControl:
-    def __init__(self, clk_pin=23, dt_pin=22, sw_pin=27, min_volume=0, max_volume=1.0, step=0.05):
+    def __init__(self, clk_pin=23, dt_pin=22, sw_pin=27, min_volume=0, max_volume=1.0, step=0.01):
         # Clean up any previous GPIO setup first
         GPIO.cleanup()
         
@@ -27,7 +27,6 @@ class VolumeControl:
         
         # Set initial volume
         pygame.mixer.music.set_volume(self.current_volume)
-        print(f"DEBUG: Volume initialized to {self.current_volume*100:.0f}%")
         
         # Set up the GPIO pins
         GPIO.setup(self.CLK_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -43,7 +42,6 @@ class VolumeControl:
     
     def start(self):
         """Start monitoring the rotary encoder in a loop"""
-        print("DEBUG: Volume control started")
         try:
             while self.running:
                 self.check_volume_change()
@@ -85,7 +83,6 @@ class VolumeControl:
         
         # Button press detected (0 means pressed with pull-up resistor)
         if current_button_state == 0 and self.last_button_state == 1:
-            print("DEBUG: Mute button pressed")
             # Toggle mute
             if pygame.mixer.music.get_volume() > 0:
                 # Store current volume and mute
@@ -100,7 +97,7 @@ class VolumeControl:
                 print(f"DEBUG: Audio unmuted, volume restored to {self.current_volume*100:.0f}%")
             
             # Add a small delay to avoid multiple detections
-            time.sleep(0.2)
+            time.sleep(0.1)
         
         self.last_button_state = current_button_state
     
@@ -116,6 +113,5 @@ class VolumeControl:
     
     def cleanup(self):
         """Clean up GPIO resources"""
-        print("DEBUG: Cleaning up volume control")
         self.running = False
         GPIO.cleanup()
