@@ -75,7 +75,7 @@ class MusicPlayer:
             pygame.mixer.music.play()
 
             metadata = self.get_song_metadata(song_path, song)
-            lcd_manager.display_song(metadata)
+            lcd_manager.display_now_playing(metadata)
 
             # Wait for the song to finish or until playback is stopped or skipped
             while pygame.mixer.music.get_busy() or self.is_paused:

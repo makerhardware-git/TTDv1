@@ -19,7 +19,7 @@ class MusicPlayerSystem:
         self.lcd_manager = LCDManager()
         self.playlist_manager = PlaylistManager()
         self.volume_control = VolumeControl()
-        # # Pass `self.on_music_end` as the callback when creating MusicPlayer
+        # Pass `self.on_music_end` as the callback when creating MusicPlayer
         self.music_player = MusicPlayer(self.on_music_end)
 
         # Set up buttons with debouncing
@@ -38,7 +38,8 @@ class MusicPlayerSystem:
         self.is_playing_music = False
         self.volume_thread = None  # Thread for volume control
 
-        self.state = "menu"  # Initial state is menu mode
+        # Changed initial state to "home" (homescreen)
+        self.state = "home"  # Initial state is now the homescreen
         self.selected_playlist = None
         self.playlists = self.playlist_manager.playlists  # Get playlists
 
@@ -48,14 +49,15 @@ class MusicPlayerSystem:
 
 
     def setup(self):
-        """Start volume control in a separate thread"""
+        """Start volume control in a separate thread and show homescreen"""
         self.volume_thread = threading.Thread(target=self.volume_control.start)
         self.volume_thread.daemon = True  # Thread will exit when main program exits
         self.volume_thread.start()
         self.lcd_manager.clear()
         self.lcd_manager.reset_selection()
         self.playlists = self.playlist_manager.playlists  # Refresh playlists
-        self.lcd_manager.display_playlists(self.playlists)
+        # Display home screen instead of playlists on startup
+        self.lcd_manager.display_home()
 
 
     def is_button_press_valid(self):
@@ -101,12 +103,34 @@ class MusicPlayerSystem:
             except Exception as e2:
                 print(f"CRITICAL ERROR: Could not reset LCD: {e2}")
 
+    def return_to_home(self):
+        """Handle transition to home screen"""
+        try:
+            self.state = "home"
+            # First clear the LCD
+            self.lcd_manager.clear()
+            sleep(0.1)  # Allow LCD to process
+            self.lcd_manager.display_home()
+        except Exception as e:
+            print(f"ERROR in return_to_home: {e}")
+            # If something fails, try a more aggressive approach
+            try:
+                # Force recreate LCD manager
+                self.lcd_manager = LCDManager()
+                time.sleep(0.1)
+                self.lcd_manager.display_home()
+            except Exception as e2:
+                print(f"CRITICAL ERROR: Could not reset home screen: {e2}")
+
 
     def handle_up_button(self):
         if not self.is_button_press_valid():
             return
-            
-        if self.state == "menu":
+        
+        if self.state == "home":
+            # In home screen, navigate between home options
+            self.lcd_manager.home_scroll_up()
+        elif self.state == "menu":
             self.lcd_manager.scroll_up(self.playlists)
             self.selected_playlist = self.lcd_manager.get_selected_playlist(self.playlists)
         elif self.state == "playback":
@@ -117,8 +141,11 @@ class MusicPlayerSystem:
     def handle_down_button(self):
         if not self.is_button_press_valid():
             return
-            
-        if self.state == "menu":
+        
+        if self.state == "home":
+            # In home screen, navigate between home options
+            self.lcd_manager.home_scroll_down()
+        elif self.state == "menu":
             self.lcd_manager.scroll_down(self.playlists)
             self.selected_playlist = self.lcd_manager.get_selected_playlist(self.playlists)
         elif self.state == "playback":
@@ -129,8 +156,19 @@ class MusicPlayerSystem:
     def handle_select_button(self):
         if not self.is_button_press_valid():
             return
-            
-        if self.state == "menu":
+        
+        if self.state == "home":
+            # Handle selection from home screen
+            selected_option = self.lcd_manager.get_selected_home_option()
+            if selected_option == "Playlists":
+                self.state = "menu"
+                self.lcd_manager.reset_selection()
+                self.lcd_manager.display_playlists(self.playlists)
+                self.selected_playlist = self.lcd_manager.get_selected_playlist(self.playlists)
+            elif selected_option == "Bluetooth":
+                self.state = "bluetooth"
+                self.lcd_manager.display_bluetooth()
+        elif self.state == "menu":
             self.selected_playlist = self.lcd_manager.get_selected_playlist(self.playlists)
             if self.selected_playlist:
                 print(f"DEBUG: Selected playlist: {self.selected_playlist}")
@@ -140,21 +178,30 @@ class MusicPlayerSystem:
         elif self.state == "playback":
             print("DEBUG: SELECT - Playback mode - toggling play/pause")
             self.music_player.toggle_play_pause()
+        elif self.state == "bluetooth":
+            # Return to home if select is pressed in bluetooth mode
+            self.return_to_home()
 
 
     def handle_left_button(self):
         if not self.is_button_press_valid():
             return
-            
-        if self.state == "playback":
+        
+        if self.state == "menu" or self.state == "bluetooth":
+            # Return to home screen from menu or bluetooth
+            self.return_to_home()
+        elif self.state == "playback":
             self.music_player.rewind_song()
 
 
     def handle_right_button(self):
         if not self.is_button_press_valid():
             return
-            
-        if self.state == "playback":
+        
+        if self.state == "menu" or self.state == "bluetooth":
+            # Return to home screen from menu or bluetooth
+            self.return_to_home()
+        elif self.state == "playback":
             self.music_player.skip_song()
 
 

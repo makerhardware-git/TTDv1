@@ -1,0 +1,15 @@
+[0;1;32m●[0m pipewire.service - PipeWire Multimedia Service
+     Loaded: loaded (]8;;file://Spkr2/usr/lib/systemd/user/pipewire.service/usr/lib/systemd/user/pipewire.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Tue 2025-04-08 09:57:00 PDT; 22h ago
+TriggeredBy: [0;1;32m●[0m pipewire.socket
+   Main PID: 594 (pipewire)
+      Tasks: 3 (limit: 166)
+        CPU: 15.337s
+     CGroup: /user.slice/user-1000.slice/user@1000.service/session.slice/pipewire.service
+             └─[0;38;5;245m594 /usr/bin/pipewire[0m
+
+Apr 08 09:57:00 Spkr2 systemd[578]: Started pipewire.service - PipeWire Multimedia Service.
+Apr 09 07:32:08 Spkr2 pipewire[594]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mpw.node: (auto_null-34) graph xrun not-triggered (0 suppressed)[0m
+Apr 09 07:32:08 Spkr2 pipewire[594]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mpw.node: (auto_null-34) xrun state:0x7f8b11d008 pending:1/2 s:1259855999685 a:1259856190476 f:1259856202612 waiting:190791 process:12136 status:triggered[0m
+Apr 09 07:37:08 Spkr2 pipewire[594]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mpw.node: (auto_null-34) graph xrun not-triggered (7 suppressed)[0m
+Apr 09 07:37:08 Spkr2 pipewire[594]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mpw.node: (auto_null-34) xrun state:0x7f8b11d008 pending:1/2 s:1559812727549 a:1559812884896 f:1559812895886 waiting:157347 process:10990 status:triggered[0m
